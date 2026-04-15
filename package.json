@@ -1,0 +1,60 @@
+{
+  "name": "hw_next",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:staged": "eslint --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "format:staged": "prettier --write",
+    "type-check": "tsc -b --noEmit",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "2.11.2",
+    "axios": "1.13.6",
+    "axios-cache-interceptor": "1.12.0",
+    "framer-motion": "12.38.0",
+    "next": "16.2.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-error-boundary": "6.1.1",
+    "react-redux": "9.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.1",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@types/react-syntax-highlighter": "15.5.13",
+    "eslint": "9.39.1",
+    "eslint-config-next": "16.2.3",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.0.1",
+    "globals": "16.5.0",
+    "husky": "9.1.7",
+    "lint-staged": "16.3.2",
+    "prettier": "3.8.1",
+    "sass": "1.99.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.48.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "npm run lint:staged --",
+      "npm run format:staged --"
+    ],
+    "*.{json,css,md,html}": [
+      "npm run format:staged --"
+    ]
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

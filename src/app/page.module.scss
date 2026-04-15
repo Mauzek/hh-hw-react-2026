@@ -1,0 +1,27 @@
+.page {
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  margin: 0 0 10px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+}
+
+.description {
+  margin: 0 0 30px;
+  font-size: 16px;
+  color: #666;
+}
