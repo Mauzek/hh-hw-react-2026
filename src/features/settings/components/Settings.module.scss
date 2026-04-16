@@ -1,0 +1,84 @@
+@use '@/styles/variables' as *;
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  padding: $space-4;
+  background-color: $color-canvas-subtle;
+  border: 1px solid $color-border-default;
+  border-radius: $radius-lg;
+  width: 100%;
+
+  &__title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+
+  &__input {
+    padding: 5px $space-3;
+    background-color: $color-canvas-inset;
+    border: 1px solid $color-border-default;
+    border-radius: $radius-md;
+    font-size: $font-size-md;
+    font-family: $font-sans;
+    color: $color-text-primary;
+    outline: none;
+    transition:
+      border-color $transition-fast,
+      box-shadow $transition-fast;
+
+    &::placeholder {
+      color: $color-text-disabled;
+    }
+
+    &:focus {
+      border-color: $color-accent-emphasis;
+      box-shadow: 0 0 0 3px $color-accent-subtle;
+    }
+
+    &--error {
+      border-color: $color-danger-text;
+
+      &:focus {
+        box-shadow: 0 0 0 3px $color-danger-muted;
+      }
+    }
+  }
+
+  &__error {
+    font-size: $font-size-sm;
+    color: $color-danger-text;
+  }
+
+  &__hint {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-2;
+    padding-top: $space-2;
+    border-top: 1px solid $color-border-muted;
+  }
+}

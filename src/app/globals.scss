@@ -1,0 +1,41 @@
+@use '@/styles/variables' as *;
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  font-family: $font-sans;
+  font-size: $font-size-md;
+  font-weight: $font-weight-normal;
+  color: $color-text-primary;
+  background-color: $color-canvas-default;
+  line-height: 1.5;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $color-canvas-default;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $color-border-default;
+  border-radius: $radius-full;
+
+  &:hover {
+    background: $color-neutral-emphasis;
+  }
+}
+
+a {
+  color: $color-text-link;
+  transition: color $transition-base;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
