@@ -25,6 +25,7 @@ export interface FindReviewerParams {
 
 export interface FindReviewerResult {
   reviewer: GitHubContributor;
+  candidates: GitHubContributor[];
   totalCandidates: number;
   filtered: {
     total: number;

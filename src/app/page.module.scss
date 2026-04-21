@@ -1,27 +1,42 @@
+@use '@/styles/variables' as *;
+
 .page {
   min-height: 100vh;
-  padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: $color-canvas-default;
+  display: flex;
+  flex-direction: column;
 }
 
 .main {
+  flex: 1;
+  width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  padding: 40px 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  padding: $space-8 $space-4;
 }
 
-.title {
-  margin: 0 0 10px;
-  font-size: 32px;
-  font-weight: 700;
-  color: #333;
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  min-height: 200px;
+  color: $color-text-secondary;
+  font-size: $font-size-md;
+
+  &::after {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border: 2px solid $color-border-default;
+    border-top-color: $color-accent-emphasis;
+    border-radius: $radius-full;
+    animation: spin 0.7s linear infinite;
+  }
 }
 
-.description {
-  margin: 0 0 30px;
-  font-size: 16px;
-  color: #666;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

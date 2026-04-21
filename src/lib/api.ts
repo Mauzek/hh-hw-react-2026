@@ -1,24 +1,46 @@
-import axios, { AxiosError } from 'axios';
-import { publicEnv, privateEnv } from './env';
+import axios from 'axios';
 import { setupCache } from 'axios-cache-interceptor';
-import {
+import type {
   FindReviewerParams,
   FindReviewerResult,
   GitHubContributor,
 } from '@/types/github';
 
+const getBaseURL = () => {
+  if (typeof window === 'undefined') {
+    return 'https://api.github.com';
+  }
+  return '/api/github';
+};
+
 const instance = axios.create({
-  baseURL: publicEnv.API_URL,
+  baseURL: getBaseURL(),
   headers: {
+    Accept: 'application/vnd.github.v3+json',
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${privateEnv.API_KEY}`,
   },
 });
+
+if (typeof window === 'undefined') {
+  const { privateEnv } = await import('@/lib/env');
+  if (privateEnv.API_KEY) {
+    instance.defaults.headers.common['Authorization'] =
+      `Bearer ${privateEnv.API_KEY}`;
+  }
+}
 
 const api = setupCache(instance, {
   ttl: 1000 * 60 * 5,
   methods: ['get'],
 });
+
+const HTTP_ERRORS: Record<number, string> = {
+  401: 'Неверный или истёкший токен GitHub',
+  403: 'Доступ запрещён — возможно, превышен rate limit',
+  404: 'Репозиторий не найден',
+  422: 'Некорректные данные запроса',
+  429: 'Превышен rate limit GitHub API',
+};
 
 const request = async <T>(
   endpoint: string,
@@ -30,54 +52,49 @@ const request = async <T>(
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
-
-      const errorMessages: Record<number, string> = {
-        401: 'Неверный или истёкший токен GitHub',
-        403: 'Доступ запрещён (возможно, превышен rate limit)',
-        404: 'Репозиторий не найден',
-        422: 'Некорректные данные',
-        429: 'Превышен rate limit GitHub API',
-      };
+      const serverMessage = (error.response?.data as { message?: string })
+        ?.message;
 
       const message =
-        (status && errorMessages[status]) ||
-        (error.response?.data as { message?: string })?.message ||
-        'Ошибка запроса';
+        (status && HTTP_ERRORS[status]) ??
+        serverMessage ??
+        'Неизвестная ошибка запроса';
 
-      throw new AxiosError(message);
+      throw new Error(String(message));
     }
 
     throw new Error(
-      error instanceof Error ? error.message : 'Unknown error occurred',
+      error instanceof Error ? error.message : 'Неизвестная ошибка',
     );
   }
 };
 
-/**
- * Валидация формата репозитория
- */
-const validateRepoFormat = (repo: string): boolean =>
-  /^[a-zA-Z0-9_-]+\/[a-zA-Z0-9_.-]+$/.test(repo);
+const validateRepo = (repo: string): void => {
+  if (!/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(repo)) {
+    throw new Error('Неверный формат репозитория — ожидается "owner/repo"');
+  }
+};
+
+const pickRandom = <T>(arr: T[]): T =>
+  arr[Math.floor(Math.random() * arr.length)];
 
 export const apiClient = {
   getContributors: async (
     repo: string,
     perPage = 100,
   ): Promise<GitHubContributor[]> => {
-    if (!validateRepoFormat(repo)) {
-      throw new Error('Неверный формат репозитория. Ожидается "owner/repo".');
-    }
+    validateRepo(repo);
     return await request<GitHubContributor[]>(`/repos/${repo}/contributors`, {
       per_page: Math.min(perPage, 100),
-      anon: false,
     });
   },
 
-  findReviewer: async (
-    params: FindReviewerParams,
-  ): Promise<FindReviewerResult> => {
-    const { repo, currentLogin, blacklist, perPage = 100 } = params;
-
+  findReviewer: async ({
+    repo,
+    currentLogin,
+    blacklist,
+    perPage = 100,
+  }: FindReviewerParams): Promise<FindReviewerResult> => {
     if (!currentLogin.trim()) {
       throw new Error('Логин пользователя не может быть пустым');
     }
@@ -85,41 +102,37 @@ export const apiClient = {
     const contributors = await apiClient.getContributors(repo, perPage);
 
     if (contributors.length === 0) {
-      throw new Error('В репозитории нет контрибьютеров');
+      throw new Error('В репозитории нет контрибьюторов');
     }
 
-    const blacklistLower = blacklist.map((login) => login.toLowerCase());
-    const currentLoginLower = currentLogin.toLowerCase();
+    const currentLower = currentLogin.toLowerCase();
+    const blacklistLower = new Set(blacklist.map((l) => l.toLowerCase()));
 
-    const filtered = contributors.filter((contributor) => {
-      const isCurrentUser =
-        contributor.login.toLowerCase() === currentLoginLower;
-      const isBlacklisted = blacklistLower.includes(
-        contributor.login.toLowerCase(),
-      );
-      return !isCurrentUser && !isBlacklisted;
+    const candidates = contributors.filter(({ login }) => {
+      const l = login.toLowerCase();
+      return l !== currentLower && !blacklistLower.has(l);
     });
 
-    if (filtered.length === 0) {
-      throw new Error(
-        'Нет подходящих ревьюеров (все исключены или это единственный контрибьютор)',
-      );
+    if (candidates.length === 0) {
+      throw new Error('Нет подходящих ревьюеров — все исключены');
     }
 
-    const randomIndex = Math.floor(Math.random() * filtered.length);
+    const isCurrentPresent = contributors.some(
+      (c) => c.login.toLowerCase() === currentLower,
+    );
 
     return {
-      reviewer: filtered[randomIndex],
+      reviewer: pickRandom(candidates),
+      candidates,
       totalCandidates: contributors.length,
       filtered: {
-        total: filtered.length,
+        total: candidates.length,
         excluded: {
-          current: contributors.some(
-            (c) => c.login.toLowerCase() === currentLoginLower,
-          )
-            ? 1
-            : 0,
-          blacklisted: contributors.length - filtered.length - 1,
+          current: isCurrentPresent ? 1 : 0,
+          blacklisted:
+            contributors.length -
+            candidates.length -
+            (isCurrentPresent ? 1 : 0),
         },
       },
     };
