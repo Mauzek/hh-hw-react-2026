@@ -155,10 +155,12 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg,
-        transparent,
-        $color-accent-emphasis,
-        transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      $color-accent-emphasis,
+      transparent
+    );
     pointer-events: none;
   }
 }
