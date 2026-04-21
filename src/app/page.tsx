@@ -11,18 +11,11 @@ const getInitialData = async (): Promise<{
   initialReviewer: GitHubContributor | null;
 }> => {
   try {
-    const [contributors, reviewerResult] = await Promise.all([
-      apiClient.getContributors(DEFAULT_REPO),
-      apiClient.findReviewer({
-        repo: DEFAULT_REPO,
-        currentLogin: '',
-        blacklist: [],
-      }),
-    ]);
+    const contributors = await apiClient.getContributors(DEFAULT_REPO);
 
     return {
       contributors,
-      initialReviewer: reviewerResult.reviewer,
+      initialReviewer: null,
     };
   } catch {
     return { contributors: [], initialReviewer: null };

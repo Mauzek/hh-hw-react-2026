@@ -66,7 +66,8 @@ export const useReviewer = ({
 
   const currentUser = login.trim()
     ? (candidates.find(
-        (c) => c.login.toLowerCase() === login.trim().toLowerCase(),
+        (c: GitHubContributor) =>
+          c.login.toLowerCase() === login.trim().toLowerCase(),
       ) ?? null)
     : null;
 
@@ -81,6 +82,13 @@ export const useReviewer = ({
     (finalReviewer: GitHubContributor, pool: GitHubContributor[]) => {
       stopAnimation();
 
+      // 🔥 Прелоад ТОЛЬКО перед запуском рулетки
+      // Не блокирует рендер, но сразу стартует загрузку в кэш браузера
+      pool.forEach((c) => {
+        const img = new window.Image();
+        img.src = c.avatar_url;
+      });
+
       if (pool.length === 0) {
         setDisplayCard(finalReviewer);
         return;
@@ -90,7 +98,6 @@ export const useReviewer = ({
       setDisplayCard(pool[0]);
 
       let step = 0;
-
       intervalRef.current = setInterval(() => {
         step++;
         const random = pool[Math.floor(Math.random() * pool.length)];
@@ -120,12 +127,7 @@ export const useReviewer = ({
     runAnimation(reviewer, candidates);
 
     return () => stopAnimation();
-  }, [reviewer?.login]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    console.log();
-    return () => stopAnimation();
-  }, [stopAnimation]);
+  }, [reviewer, candidates, runAnimation, stopAnimation]);
 
   const handleFind = useCallback(() => {
     if (!login.trim() || !repo.trim()) {

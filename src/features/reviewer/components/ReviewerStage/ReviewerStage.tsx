@@ -290,7 +290,6 @@ export const ReviewerStage = ({
                 width={64}
                 height={64}
                 className={styles.stage__avatarImage}
-                style={{ width: '100%', height: '100%' }}
                 priority
               />
             </div>

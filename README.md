@@ -1,13 +1,26 @@
-# GitHub Reviewer Finder
+## Что сделано:
 
-Одностраничное приложение для поиска ревьюера в репозитории GitHub. Приложение помогает найти подходящего контрибьютора из списка авторов коммитов, исключив текущего пользователя и чёрный список.
+**React**
 
-## 📦 Переменные окружения
+- Настройки: логин, репозиторий, blacklist с сохранением в `localStorage`
+- Запрос к GitHub REST API с кешированием через `axios-cache-interceptor`
+- Фильтрация текущего пользователя и blacklist
+- Случайный выбор ревьюера с анимацией рулетки
 
-Создай файл `.env.local`:
+**Redux**
 
-```env
-VITE_GITHUB_KEY_API=your_github_token_here
-```
+- Хранение ответов GitHub API в store
+- `idle / loading / success / error` статусы
 
-Получить токен: [GitHub Settings → Developer settings → Personal access tokens](https://github.com/settings/tokens)
+**Дополнительно**
+
+- SSR — начальные данные загружаются на сервере
+- Проксирование запросов через Route Handler (обход CORS)
+
+## Стек
+
+Next.js 16 · React 19 · TypeScript · Redux Toolkit · SCSS Modules · Framer Motion + настроена инфраструктура
+
+### **[🚀 Демо](https://reviewerfinder.vercel.app/)**
+
+DEFAULT_REPO = `facebook/facebook-ios-sdk`

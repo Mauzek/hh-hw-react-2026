@@ -1,6 +1,7 @@
 'use client';
 
-import { ButtonHTMLAttributes, FC, ReactNode } from 'react';
+import { ButtonHTMLAttributes, FC, ReactNode, memo } from 'react';
+import classnames from 'classnames';
 import styles from './Button.module.scss';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -16,11 +17,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   rightIcon?: ReactNode;
 }
 
-const buildClassName = (
-  ...classes: Array<string | false | undefined | null>
-): string => classes.filter(Boolean).join(' ');
-
-export const Button: FC<ButtonProps> = ({
+const ButtonComponent: FC<ButtonProps> = ({
   children,
   variant = 'primary',
   size = 'md',
@@ -35,7 +32,7 @@ export const Button: FC<ButtonProps> = ({
 }) => {
   const isDisabled = disabled || isLoading;
 
-  const rootClassName = buildClassName(
+  const rootClassName = classnames(
     styles.button,
     styles[`button--${variant}`],
     styles[`button--${size}`],
@@ -68,7 +65,7 @@ export const Button: FC<ButtonProps> = ({
 
       {!isLoading && rightIcon && (
         <span
-          className={buildClassName(
+          className={classnames(
             styles.button__icon,
             styles['button__icon--right'],
           )}
@@ -80,3 +77,5 @@ export const Button: FC<ButtonProps> = ({
     </button>
   );
 };
+
+export const Button = memo(ButtonComponent);

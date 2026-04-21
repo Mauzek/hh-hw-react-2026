@@ -1,6 +1,7 @@
 'use client';
 
-import { InputHTMLAttributes, forwardRef, useId } from 'react';
+import { InputHTMLAttributes, useId } from 'react';
+import classnames from 'classnames';
 import styles from './Input.module.scss';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -9,56 +10,56 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   hint?: string;
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, hint, className, id, ...rest }, ref) => {
-    const generatedId = useId();
-    const inputId = id ?? generatedId;
+export const Input = ({
+  label,
+  error,
+  hint,
+  className,
+  id,
+  ...rest
+}: InputProps) => {
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
 
-    const inputClassName = [
-      styles.input__field,
-      error ? styles['input__field--error'] : '',
-      className ?? '',
-    ]
-      .filter(Boolean)
-      .join(' ');
+  const inputClassName = classnames(
+    styles.input__field,
+    error && styles['input__field--error'],
+    className,
+  );
 
-    return (
-      <div className={styles.input}>
-        {label && (
-          <label className={styles.input__label} htmlFor={inputId}>
-            {label}
-          </label>
-        )}
+  return (
+    <div className={styles.input}>
+      {label && (
+        <label className={styles.input__label} htmlFor={inputId}>
+          {label}
+        </label>
+      )}
 
-        <input
-          ref={ref}
-          id={inputId}
-          className={inputClassName}
-          aria-invalid={Boolean(error)}
-          aria-describedby={
-            error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined
-          }
-          {...rest}
-        />
+      <input
+        id={inputId}
+        className={inputClassName}
+        aria-invalid={Boolean(error)}
+        aria-describedby={
+          error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined
+        }
+        {...rest}
+      />
 
-        {error && (
-          <span
-            id={`${inputId}-error`}
-            className={styles.input__error}
-            role="alert"
-          >
-            {error}
-          </span>
-        )}
+      {error && (
+        <span
+          id={`${inputId}-error`}
+          className={styles.input__error}
+          role="alert"
+        >
+          {error}
+        </span>
+      )}
 
-        {!error && hint && (
-          <span id={`${inputId}-hint`} className={styles.input__hint}>
-            {hint}
-          </span>
-        )}
-      </div>
-    );
-  },
-);
-
-Input.displayName = 'Input';
+      {hint && !error && (
+        <span id={`${inputId}-hint`} className={styles.input__hint}>
+          {hint}
+        </span>
+      )}
+    </div>
+  );
+};

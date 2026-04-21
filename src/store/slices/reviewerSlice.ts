@@ -39,32 +39,18 @@ export const fetchReviewer = createAsyncThunk<
   FindReviewerResult,
   FindReviewerParams,
   { rejectValue: string }
->('reviewer/findReviewer', async (params, { rejectWithValue }) => {
+>('reviewer/findReviewer', async (params, { rejectWithValue, signal }) => {
   try {
     return await apiClient.findReviewer(params);
   } catch (error) {
+    if (signal.aborted) {
+      return rejectWithValue('Запрос отменён');
+    }
     return rejectWithValue(
       error instanceof Error ? error.message : 'Неизвестная ошибка',
     );
   }
 });
-
-export const fetchContributors = createAsyncThunk<
-  GitHubContributor[],
-  { repo: string; perPage?: number },
-  { rejectValue: string }
->(
-  'reviewer/fetchContributors',
-  async ({ repo, perPage }, { rejectWithValue }) => {
-    try {
-      return await apiClient.getContributors(repo, perPage);
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : 'Неизвестная ошибка',
-      );
-    }
-  },
-);
 
 const reviewerSlice = createSlice({
   name: 'reviewer',
@@ -99,20 +85,6 @@ const reviewerSlice = createSlice({
         state.findResult = rest;
       })
       .addCase(fetchReviewer.rejected, (state, action) => {
-        state.status = 'error';
-        state.error = action.payload ?? 'Неизвестная ошибка';
-      });
-
-    builder
-      .addCase(fetchContributors.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(fetchContributors.fulfilled, (state, action) => {
-        state.status = 'success';
-        state.contributors = action.payload;
-      })
-      .addCase(fetchContributors.rejected, (state, action) => {
         state.status = 'error';
         state.error = action.payload ?? 'Неизвестная ошибка';
       });

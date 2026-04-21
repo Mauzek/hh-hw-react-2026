@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { selectLogin, selectRepo } from '@/store/selectors';
 import { useReviewer } from '@/features/reviewer/hooks/useReviewer';
@@ -40,9 +40,9 @@ export const ReviewerFinder = ({
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const handleToggleSettings = useCallback(() => {
+  const handleToggleSettings = () => {
     setIsSettingsOpen((prev) => !prev);
-  }, []);
+  };
 
   const isFindDisabled = isMounted
     ? isAnimating || !login.trim() || !repo.trim()
@@ -62,7 +62,7 @@ export const ReviewerFinder = ({
             className={styles.finder__logo}
           />
           <h1 className={styles.finder__title}>
-            Reviewer<p>Finder</p>
+            Reviewer<span>Finder</span>
           </h1>
         </div>
 

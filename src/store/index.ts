@@ -5,7 +5,6 @@ export * from './selectors';
 export { updateSettings, resetSettings } from './slices/settingsSlice';
 export {
   fetchReviewer,
-  fetchContributors,
   clearReviewer,
   clearError,
   clearContributors,
