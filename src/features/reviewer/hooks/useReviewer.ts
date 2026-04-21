@@ -82,8 +82,8 @@ export const useReviewer = ({
     (finalReviewer: GitHubContributor, pool: GitHubContributor[]) => {
       stopAnimation();
 
-      // 🔥 Прелоад ТОЛЬКО перед запуском рулетки
-      // Не блокирует рендер, но сразу стартует загрузку в кэш браузера
+      // Preload: браузер положит картинки в кэш,
+      // и при смене кадров не будет задержек на загрузку
       pool.forEach((c) => {
         const img = new window.Image();
         img.src = c.avatar_url;
